@@ -80,11 +80,11 @@ type JSONRPCClient struct {
 	client *http.Client
 }
 
-func NewJSONRPCClient(url string) *JSONRPCClient {
+func NewJSONRPCClient(url string) (*JSONRPCClient, error) {
 	return &JSONRPCClient{
 		url:    url,
 		client: &http.Client{},
-	}
+	}, nil
 }
 
 func (j *JSONRPCClient) CommonCall(serviceMethod string, args interface{}) (interface{}, error) {
