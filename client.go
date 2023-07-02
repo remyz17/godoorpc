@@ -43,16 +43,36 @@ func NewXMLRPCClient(url string) (*XMLRPCClient, error) {
 	}, nil
 }
 
+func (x *XMLRPCClient) call(c *xmlrpc.Client, serviceMethod string, args interface{}) (interface{}, error) {
+	var reply interface{}
+	if err := c.Call(serviceMethod, args, &reply); err != nil {
+		return nil, err
+	}
+	return reply, nil
+}
+
 func (x *XMLRPCClient) CommonCall(serviceMethod string, args interface{}) (interface{}, error) {
-	return "", errors.New("Not Implemented")
+	resp, err := x.call(x.common, serviceMethod, args)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 func (x *XMLRPCClient) ObjectCall(serviceMethod string, args interface{}) (interface{}, error) {
-	return "", errors.New("Not Implemented")
+	resp, err := x.call(x.object, serviceMethod, args)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 func (x *XMLRPCClient) DbCall(serviceMethod string, args interface{}) (interface{}, error) {
-	return "", errors.New("Not Implemented")
+	resp, err := x.call(x.db, serviceMethod, args)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 type JSONRPCClient struct {
