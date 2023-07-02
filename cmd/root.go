@@ -17,7 +17,12 @@ var rootCmd = &cobra.Command{
 	
 Both XML and JSON RPC protocols are supported.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("This is a demo")
+		url := viper.GetString("url")
+		db := viper.GetString("db")
+		username := viper.GetString("username")
+		password := viper.GetString("password")
+
+		fmt.Printf("URL: %s, DB: %s, Username: %s, Password: %s\n", url, db, username, password)
 	},
 }
 
@@ -29,12 +34,17 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}
-
-func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.godoorpc.yaml)")
+	rootCmd.PersistentFlags().String("url", "", "URL du serveur Odoo")
+	rootCmd.PersistentFlags().String("db", "", "Nom de la base de données Odoo")
+	rootCmd.PersistentFlags().String("username", "", "Nom d'utilisateur Odoo")
+	rootCmd.PersistentFlags().String("password", "", "Mot de passe Odoo")
+
+	viper.BindPFlag("url", rootCmd.PersistentFlags().Lookup("url"))
+	viper.BindPFlag("db", rootCmd.PersistentFlags().Lookup("db"))
+	viper.BindPFlag("username", rootCmd.PersistentFlags().Lookup("username"))
+	viper.BindPFlag("password", rootCmd.PersistentFlags().Lookup("password"))
 }
 
 // initConfig reads in config file and ENV variables if set.
