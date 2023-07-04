@@ -1,6 +1,8 @@
 package godoorpc
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type OdooService struct {
 	URL      string
@@ -8,6 +10,23 @@ type OdooService struct {
 	Username string
 	Password string
 	client   RpcClient
+}
+
+type Version struct {
+	ServerVersion     string      `xmlrpc:"server_version"`
+	ServerVersionInfo interface{} `xmlrpc:"server_version_info"`
+	ServerSerie       string      `xmlrpc:"server_serie"`
+	ProtocolVersion   int         `xmlrpc:"protocol_version"`
+}
+
+func (s *OdooService) Version() (*Version, error) {
+	var err error
+	reply := Version{}
+	err = s.client.CommonCall("version", &reply, nil)
+	if err != nil {
+		return nil, err
+	}
+	return &reply, nil
 }
 
 func NewOdooService(protocol, url, db, username, password string) (*OdooService, error) {
