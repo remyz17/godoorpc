@@ -59,7 +59,7 @@ func (x *XMLRPCClient) CommonCall(serviceMethod string, reply any, args interfac
 }
 
 func (x *XMLRPCClient) ObjectCall(serviceMethod string, reply any, args interface{}) error {
-	err := x.call(x.common, serviceMethod, reply, args)
+	err := x.call(x.object, serviceMethod, reply, args)
 	if err != nil {
 		return err
 	}
@@ -67,7 +67,7 @@ func (x *XMLRPCClient) ObjectCall(serviceMethod string, reply any, args interfac
 }
 
 func (x *XMLRPCClient) DbCall(serviceMethod string, reply any, args interface{}) error {
-	err := x.call(x.common, serviceMethod, reply, args)
+	err := x.call(x.db, serviceMethod, reply, args)
 	if err != nil {
 		return err
 	}
