@@ -3,12 +3,15 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"reflect"
 
+	"github.com/remyz17/godoorpc/pkg/godoorpc"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
+var odooService *godoorpc.OdooService
 
 var rootCmd = &cobra.Command{
 	Use:   "godoorpc",
@@ -16,13 +19,17 @@ var rootCmd = &cobra.Command{
 	Long: `GodooRPC allow you to communicate with Odoo ERP through it's external API.
 	
 Both XML and JSON RPC protocols are supported.`,
-	Run: func(cmd *cobra.Command, args []string) {
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		url := viper.GetString("url")
 		db := viper.GetString("db")
 		username := viper.GetString("username")
 		password := viper.GetString("password")
 
-		fmt.Printf("URL: %s, DB: %s, Username: %s, Password: %s\n", url, db, username, password)
+		if reflect.ValueOf(odooService).IsZero() {
+			var err error
+			odooService, err = godoorpc.NewOdooService("xmlrpc", url, db, username, password)
+			cobra.CheckErr(err)
+		}
 	},
 }
 
