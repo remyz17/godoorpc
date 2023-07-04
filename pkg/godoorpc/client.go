@@ -9,9 +9,9 @@ import (
 )
 
 type RpcClient interface {
-	CommonCall(serviceMethod string, args interface{}) (interface{}, error)
-	ObjectCall(serviceMethod string, args interface{}) (interface{}, error)
-	DbCall(serviceMethod string, args interface{}) (interface{}, error)
+	CommonCall(serviceMethod string, reply any, args interface{}) error
+	ObjectCall(serviceMethod string, reply any, args interface{}) error
+	DbCall(serviceMethod string, reply any, args interface{}) error
 }
 
 type XMLRPCClient struct {
@@ -23,7 +23,7 @@ type XMLRPCClient struct {
 func NewXMLRPCClient(url string) (*XMLRPCClient, error) {
 	commonClient, err := xmlrpc.NewClient(url+"/xmlrpc/2/common", nil)
 	if err != nil {
-		return nil, errors.New("failed to create common client: %w", err)
+		return nil, fmt.Errorf("failed to create common client: %w", err)
 	}
 
 	objectClient, err := xmlrpc.NewClient(url+"/xmlrpc/2/object", nil)
@@ -43,36 +43,35 @@ func NewXMLRPCClient(url string) (*XMLRPCClient, error) {
 	}, nil
 }
 
-func (x *XMLRPCClient) call(c *xmlrpc.Client, serviceMethod string, args interface{}) (interface{}, error) {
-	var reply interface{}
-	if err := c.Call(serviceMethod, args, &reply); err != nil {
-		return nil, err
+func (x *XMLRPCClient) call(c *xmlrpc.Client, serviceMethod string, reply any, args interface{}) error {
+	if err := c.Call(serviceMethod, args, reply); err != nil {
+		return err
 	}
-	return reply, nil
+	return nil
 }
 
-func (x *XMLRPCClient) CommonCall(serviceMethod string, args interface{}) (interface{}, error) {
-	resp, err := x.call(x.common, serviceMethod, args)
+func (x *XMLRPCClient) CommonCall(serviceMethod string, reply any, args interface{}) error {
+	err := x.call(x.common, serviceMethod, reply, args)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return resp, nil
+	return nil
 }
 
-func (x *XMLRPCClient) ObjectCall(serviceMethod string, args interface{}) (interface{}, error) {
-	resp, err := x.call(x.object, serviceMethod, args)
+func (x *XMLRPCClient) ObjectCall(serviceMethod string, reply any, args interface{}) error {
+	err := x.call(x.common, serviceMethod, reply, args)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return resp, nil
+	return nil
 }
 
-func (x *XMLRPCClient) DbCall(serviceMethod string, args interface{}) (interface{}, error) {
-	resp, err := x.call(x.db, serviceMethod, args)
+func (x *XMLRPCClient) DbCall(serviceMethod string, reply any, args interface{}) error {
+	err := x.call(x.common, serviceMethod, reply, args)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return resp, nil
+	return nil
 }
 
 type JSONRPCClient struct {
@@ -87,14 +86,14 @@ func NewJSONRPCClient(url string) (*JSONRPCClient, error) {
 	}, nil
 }
 
-func (j *JSONRPCClient) CommonCall(serviceMethod string, args interface{}) (interface{}, error) {
-	return "", errors.New("Not Implemented")
+func (j *JSONRPCClient) CommonCall(serviceMethod string, reply any, args interface{}) error {
+	return errors.New("Not Implemented")
 }
 
-func (j *JSONRPCClient) ObjectCall(serviceMethod string, args interface{}) (interface{}, error) {
-	return "", errors.New("Not Implemented")
+func (j *JSONRPCClient) ObjectCall(serviceMethod string, reply any, args interface{}) error {
+	return errors.New("Not Implemented")
 }
 
-func (j *JSONRPCClient) DbCall(serviceMethod string, args interface{}) (interface{}, error) {
-	return "", errors.New("Not Implemented")
+func (j *JSONRPCClient) DbCall(serviceMethod string, reply any, args interface{}) error {
+	return errors.New("Not Implemented")
 }
