@@ -24,7 +24,22 @@ This attribute comes from common.version() rpc method`,
 	},
 }
 
+var listDatabaseCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List Odoo database",
+	Long:  `This command show up the availible databases on Odoo server.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		dbs, err := odooService.ListDatabase()
+		cobra.CheckErr(err)
+		fmt.Println("List of databases:")
+		for _, db := range *dbs {
+			fmt.Println(db)
+		}
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(serverCmd)
 	serverCmd.AddCommand(versionCmd)
+	serverCmd.AddCommand(listDatabaseCmd)
 }

@@ -29,6 +29,15 @@ func (s *OdooService) Version() (*Version, error) {
 	return &reply, nil
 }
 
+func (s *OdooService) ListDatabase() (*[]string, error) {
+	var dbs []string
+	err := s.client.DbCall("list", &dbs, nil)
+	if err != nil {
+		return nil, err
+	}
+	return &dbs, nil
+}
+
 func NewOdooService(protocol, url, db, username, password string) (*OdooService, error) {
 	var client RpcClient
 	var err error
