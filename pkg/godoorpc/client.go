@@ -46,34 +46,19 @@ func NewXMLRPCClient(url string) (*XMLRPCClient, error) {
 }
 
 func (x *XMLRPCClient) call(c *xmlrpc.Client, serviceMethod string, reply any, args interface{}) error {
-	if err := c.Call(serviceMethod, args, reply); err != nil {
-		return err
-	}
-	return nil
+	return c.Call(serviceMethod, args, reply)
 }
 
 func (x *XMLRPCClient) CommonCall(serviceMethod string, reply any, args interface{}) error {
-	err := x.call(x.common, serviceMethod, reply, args)
-	if err != nil {
-		return err
-	}
-	return nil
+	return x.call(x.common, serviceMethod, reply, args)
 }
 
 func (x *XMLRPCClient) ObjectCall(serviceMethod string, reply any, args interface{}) error {
-	err := x.call(x.object, serviceMethod, reply, args)
-	if err != nil {
-		return err
-	}
-	return nil
+	return x.call(x.object, serviceMethod, reply, args)
 }
 
 func (x *XMLRPCClient) DbCall(serviceMethod string, reply any, args interface{}) error {
-	err := x.call(x.db, serviceMethod, reply, args)
-	if err != nil {
-		return err
-	}
-	return nil
+	return x.call(x.db, serviceMethod, reply, args)
 }
 
 type JSONRPCClient struct {
