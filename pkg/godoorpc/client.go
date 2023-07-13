@@ -1,8 +1,10 @@
 package godoorpc
 
 import (
-	"errors"
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 
 	"github.com/kolo/xmlrpc"
@@ -86,14 +88,54 @@ func NewJSONRPCClient(url string) (*JSONRPCClient, error) {
 	}, nil
 }
 
+func (j *JSONRPCClient) doCall(service, serviceMethod string, reply any, args interface{}) error {
+	data := map[string]interface{}{
+		"jsonrpc": "2.0",
+		"method":  "call",
+		"params": map[string]interface{}{
+			"service": service,
+			"method":  serviceMethod,
+			"args":    args,
+		},
+		"id": rand.Intn(1000000000),
+	}
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", j.url+"/jsonrpc", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := j.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected HTTP status: %d", resp.StatusCode)
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(reply)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (j *JSONRPCClient) CommonCall(serviceMethod string, reply any, args interface{}) error {
-	return errors.New("Not Implemented")
+	return j.doCall("common", serviceMethod, reply, args)
 }
 
 func (j *JSONRPCClient) ObjectCall(serviceMethod string, reply any, args interface{}) error {
-	return errors.New("Not Implemented")
+	return j.doCall("object", serviceMethod, reply, args)
 }
 
 func (j *JSONRPCClient) DbCall(serviceMethod string, reply any, args interface{}) error {
-	return errors.New("Not Implemented")
+	return j.doCall("db", serviceMethod, reply, args)
 }
